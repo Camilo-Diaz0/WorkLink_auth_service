@@ -34,5 +34,11 @@ public class UsuarioController {
 
     }
 
+    @GetMapping("/get")
+    @PreAuthorize("hasRole('cliente')")
+    public ResponseEntity<String> mensaje(){
+        return ResponseEntity.ok("Logeado correctamente");
+    }
+
 }
 
