@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -26,5 +27,18 @@ public class UsuarioService {
 
     public Optional<Usuario> buscar(Long id){
         return repository.findById(id);
+    }
+
+    public Optional<Usuario>buscarPorCorreo(String correo) {
+        return repository.findByCorreo(correo);
+    }
+
+    public Usuario cambiarPassword(String password, Usuario usuario){
+        password = passwordEncoder.encode(password);
+        usuario.setPassword(password);
+        usuario.setUpdate_at(LocalDateTime.now());
+        usuario = repository.save(usuario);
+        if(usuario.getPassword().equals(password)) return usuario;
+        return null;
     }
 }
