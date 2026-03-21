@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/user")
+@CrossOrigin(originPatterns = "*")
 public class UsuarioController {
 
     @Autowired
@@ -27,7 +28,7 @@ public class UsuarioController {
     private Logger logger = Logger.getAnonymousLogger();
 
     @GetMapping("/{id}")
-    public ResponseEntity buscarPorId(@PathVariable Long id){
+    public ResponseEntity<?> buscarPorId(@PathVariable Long id){
         Optional<Usuario> optionalUsuario = usuarioService.buscar(id);
         if (optionalUsuario.isEmpty()) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(optionalUsuario.get());
