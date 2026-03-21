@@ -1,16 +1,18 @@
 package com.example.service_auth.controllers;
 
-import com.example.service_auth.dto.ChangePasswordDto;
+import com.example.service_auth.dto.ChangePasswordRequest;
+import com.example.service_auth.dto.PasswordResetRequest;
+import com.example.service_auth.dto.RegistroRequest;
 import com.example.service_auth.entities.PasswordResetToken;
 import com.example.service_auth.entities.Usuario;
 import com.example.service_auth.service.PasswordResetTokenService;
 import com.example.service_auth.service.UsuarioService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -25,7 +27,7 @@ public class UsuarioController {
     @Autowired
     private PasswordResetTokenService tokenService;
 
-    private Logger logger = Logger.getAnonymousLogger();
+    public static Logger logger = Logger.getAnonymousLogger();
 
     @GetMapping("/{id}")
     public ResponseEntity<?> buscarPorId(@PathVariable Long id){
@@ -36,10 +38,9 @@ public class UsuarioController {
     }
 
     @PostMapping("/registrar")
-    public ResponseEntity<Usuario> registrar(@RequestBody Usuario usuario){
-        if(usuario.getId() != null ) return ResponseEntity.badRequest().build();
+    public ResponseEntity<Usuario> registrar(@Valid @RequestBody RegistroRequest usuarioDto){
 
-        Usuario save = usuarioService.save(usuario);
+        Usuario save = usuarioService.registrar(usuarioDto);
         if(save == null)  return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(save);
 
@@ -52,10 +53,9 @@ public class UsuarioController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<String> forgotPassword(@RequestBody ChangePasswordDto dto){
+    public ResponseEntity<String> forgotPassword(@Valid @RequestBody PasswordResetRequest dto){
         String correo = dto.getCorreo();
         Optional<Usuario> usuario = usuarioService.buscarPorCorreo(correo);
-        logger.info(correo);
         if(usuario.isEmpty()){
             return ResponseEntity.ok("Si el correo esta registrado, se enviara un enlace");
         }
@@ -68,11 +68,10 @@ public class UsuarioController {
     }
 
     @PostMapping("/new-password")
-    public ResponseEntity<String> editPassword(@RequestBody ChangePasswordDto dto){
+    public ResponseEntity<String> editPassword(@Valid @RequestBody ChangePasswordRequest dto){
         if(!tokenService.isValidToken(dto.getToken())){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token invalido o expirado");
         }
-        logger.info(dto.getPassword() + " : " + dto.getToken());
         Usuario usuario = tokenService.getUserByToken(dto.getToken());
         tokenService.invalidateToken(dto.getToken());
         usuario = usuarioService.cambiarPassword(dto.getPassword(), usuario);

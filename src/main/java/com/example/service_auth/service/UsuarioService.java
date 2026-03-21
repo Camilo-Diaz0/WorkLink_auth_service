@@ -1,11 +1,11 @@
 package com.example.service_auth.service;
 
+import com.example.service_auth.dto.RegistroRequest;
 import com.example.service_auth.entities.Usuario;
 import com.example.service_auth.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -23,6 +23,17 @@ public class UsuarioService {
         if(save.getId() != null) return save;
         return null;
 
+    }
+    public Usuario registrar(RegistroRequest dto){
+        Usuario usuario = new Usuario(
+                dto.getNombre(),
+                dto.getApellido(),
+                dto.getCorreo(),
+                dto.getPassword(),
+                dto.getTelefono(),
+                dto.getRol()
+        );
+        return save(usuario);
     }
 
     public Optional<Usuario> buscar(Long id){
