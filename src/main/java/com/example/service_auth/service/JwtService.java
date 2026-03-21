@@ -2,12 +2,11 @@ package com.example.service_auth.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-
+import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,11 +31,11 @@ public class JwtService {
 
     private Claims extractAllClaims(String token) {
         return Jwts
-                .parserBuilder()
-                .setSigningKey(getSignKey())
+                .parser()
+                .verifyWith((SecretKey) getSignKey())
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
     }
     private Boolean isTokenExpired(String token){
         return extractExpiration(token).before(new Date());
@@ -52,11 +51,11 @@ public class JwtService {
     }
     private String createToken(Map<String,Object> claims, String username){
         return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(username)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() +(1000*3600*24)))
-                .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
+                .claims(claims)
+                .subject(username)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() +(1000*3600*24)))
+                .signWith((SecretKey)getSignKey(), Jwts.SIG.HS256).compact();
     }
 
     private Key getSignKey() {
