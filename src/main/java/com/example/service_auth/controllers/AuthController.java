@@ -2,11 +2,11 @@ package com.example.service_auth.controllers;
 
 import com.example.service_auth.dto.AuthRequest;
 import com.example.service_auth.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +21,7 @@ public class AuthController {
     AuthService service;
 
     @PostMapping("/login")
-    public ResponseEntity<String> autenticar(@RequestBody AuthRequest authRequest){
+    public ResponseEntity<String> autenticar(@Valid @RequestBody AuthRequest authRequest){
         try{
             String token = service.crearToken(authRequest);
             return ResponseEntity.ok(token);

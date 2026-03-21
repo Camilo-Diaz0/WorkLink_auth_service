@@ -1,10 +1,17 @@
 package com.example.service_auth.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Table(
+        name = "usuario",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "UK_usuario_correo", columnNames = {"correo"})
+        }
+)
 public class Usuario {
 
     @Id
@@ -14,6 +21,7 @@ public class Usuario {
     private String apellido;
     @Column(unique = true, nullable = false)
     private String correo;
+    @JsonIgnore
     private String password;
     private String telefono;
     private String rol;
