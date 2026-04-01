@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 
 @RestController("")
 @CrossOrigin(originPatterns = "*")
@@ -21,10 +23,10 @@ public class AuthController {
     AuthService service;
 
     @PostMapping("/login")
-    public ResponseEntity<String> autenticar(@Valid @RequestBody AuthRequest authRequest){
+    public ResponseEntity<?> autenticar(@Valid @RequestBody AuthRequest authRequest){
         try{
             String token = service.crearToken(authRequest);
-            return ResponseEntity.ok(token);
+            return ResponseEntity.ok(Map.of("token", token));
         }  catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Correo o Contraseña incorrecta");
