@@ -34,7 +34,7 @@ public class RegistroRequest {
 
     @NotBlank(message = "El rol es obligatorio")
     @Pattern(
-            regexp = "^(ADMIN|cliente|proovedor)$",
+            regexp = "^(ADMIN|cliente|proveedor)$",
             message = "El rol debe ser ADMIN, cliente o proovedor "
     )
     private String rol;

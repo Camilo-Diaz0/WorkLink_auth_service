@@ -5,8 +5,11 @@ import com.example.service_auth.dto.PasswordResetRequest;
 import com.example.service_auth.dto.RegistroRequest;
 import com.example.service_auth.entities.PasswordResetToken;
 import com.example.service_auth.entities.Usuario;
+import com.example.service_auth.service.JwtService;
 import com.example.service_auth.service.PasswordResetTokenService;
 import com.example.service_auth.service.UsuarioService;
+
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,13 +22,14 @@ import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(originPatterns = "*")
 public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
     @Autowired
     private PasswordResetTokenService tokenService;
+    @Autowired
+    private JwtService jwtService;
 
     public static Logger logger = Logger.getAnonymousLogger();
 
@@ -47,9 +51,13 @@ public class UsuarioController {
     }
 
     @GetMapping("/get")
-    @PreAuthorize("hasRole('cliente')")
-    public ResponseEntity<String> mensaje(){
-        return ResponseEntity.ok("Logeado correctamente");
+    @PreAuthorize("hasAnyRole('cliente','proveedor')")
+    public ResponseEntity<?> currentUser(HttpServletRequest request){
+        String jwt = request.getHeader("Authorization").replace("Bearer ", "");
+        String correo = jwtService.extractUsername(jwt);
+        Optional<Usuario> usuarioOpt = usuarioService.buscarPorCorreo(correo);
+        if (usuarioOpt.isEmpty()) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(usuarioOpt.get());
     }
 
     @PostMapping("/forgot-password")
