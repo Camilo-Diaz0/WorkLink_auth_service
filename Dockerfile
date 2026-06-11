@@ -1,5 +1,12 @@
+# Etapa 1: compilar el proyecto
+FROM maven:3.9-eclipse-temurin-24 AS build
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# Etapa 2: imagen final ligera (solo el JRE para ejecutar)
 FROM eclipse-temurin:24-jre-noble
-ARG JAR_FILE=target/service_auth-0.0.1-SNAPSHOT.jar
-COPY ${JAR_FILE} auth_service.jar
+COPY --from=build /app/target/*.jar auth_service.jar
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","/auth_service.jar"]
