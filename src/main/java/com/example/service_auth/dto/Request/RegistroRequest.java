@@ -1,4 +1,4 @@
-package com.example.service_auth.dto;
+package com.example.service_auth.dto.Request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -34,8 +34,8 @@ public class RegistroRequest {
 
     @NotBlank(message = "El rol es obligatorio")
     @Pattern(
-            regexp = "^(ADMIN|cliente|proveedor)$",
-            message = "El rol debe ser ADMIN, cliente o proovedor "
+            regexp = "^(cliente|proveedor)$",
+            message = "El rol debe ser cliente o proveedor"
     )
     private String rol;
 

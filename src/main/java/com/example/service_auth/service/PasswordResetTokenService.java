@@ -12,8 +12,11 @@ import java.util.Optional;
 @Service
 public class PasswordResetTokenService {
 
-    @Autowired
-    private PasswordResetTokenRepository repository;
+    private final PasswordResetTokenRepository repository;
+
+    PasswordResetTokenService(PasswordResetTokenRepository repository) {
+        this.repository = repository;
+    }
 
     public PasswordResetToken saveToken(Usuario usuario, String token) {
         //verificar que no haya un token activo
@@ -31,21 +34,31 @@ public class PasswordResetTokenService {
     }
 
     public boolean isValidToken(String token) {
-        return repository.findByToken(token)
-                .filter(t -> !t.isUsed() && t.getExpiryDate().isAfter(LocalDateTime.now()))
-                .isPresent();
+        Optional<PasswordResetToken> tokenOpt = repository.findByToken(token);
+        if (tokenOpt.isEmpty()) {
+            return false;
+        }
+        PasswordResetToken resetToken = tokenOpt.get();
+        if (resetToken.isUsed()) {
+            return false;
+        }
+        return resetToken.getExpiryDate().isAfter(LocalDateTime.now());
     }
 
     public Usuario getUserByToken(String token) {
-        return repository.findByToken(token)
-                .map(PasswordResetToken::getUsuario)
-                .orElseThrow(() -> new RuntimeException("Token inválido"));
+        Optional<PasswordResetToken> tokenOpt = repository.findByToken(token);
+        if (tokenOpt.isEmpty()) {
+            throw new RuntimeException("Token inválido");
+        }
+        return tokenOpt.get().getUsuario();
     }
 
     public void invalidateToken(String token) {
-        repository.findByToken(token).ifPresent(t -> {
-            t.setUsed(true);
-            repository.save(t);
-        });
+        Optional<PasswordResetToken> tokenOpt = repository.findByToken(token);
+        if (tokenOpt.isPresent()) {
+            PasswordResetToken resetToken = tokenOpt.get();
+            resetToken.setUsed(true);
+            repository.save(resetToken);
+        }
     }
 }

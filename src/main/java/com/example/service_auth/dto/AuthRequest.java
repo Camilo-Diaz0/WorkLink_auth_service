@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 
 
 public class AuthRequest {
-
     @Email
     @NotBlank
     private String correo;

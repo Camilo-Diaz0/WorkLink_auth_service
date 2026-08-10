@@ -7,27 +7,36 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(
-        name = "usuario",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "UK_usuario_correo", columnNames = {"correo"})
-        }
+    name = "usuario",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "UK_usuario_correo", columnNames = {"correo"})
+    }
 )
 public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String nombre;
+
     private String apellido;
+
     @Column(unique = true, nullable = false)
     private String correo;
+
     @JsonIgnore
     private String password;
+
     private String telefono;
     private String rol;
+
     private boolean activo;
+
     private boolean verificado;
+
     private LocalDateTime created_at;
+
     private  LocalDateTime update_at;
 
     public Usuario() {}

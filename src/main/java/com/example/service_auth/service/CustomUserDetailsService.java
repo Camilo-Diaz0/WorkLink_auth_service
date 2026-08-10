@@ -20,8 +20,10 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String correo) throws UsernameNotFoundException {
-        Optional<Usuario> usuario = usuarioRepository.findByCorreo(correo);
-        return usuario.map(UserSecurity::new)
-                .orElseThrow(() -> new UsernameNotFoundException("user no encontrado; " + correo));
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByCorreo(correo);
+        if (usuarioOpt.isEmpty()) {
+            throw new UsernameNotFoundException("user no encontrado; " + correo);
+        }
+        return new UserSecurity(usuarioOpt.get());
     }
 }

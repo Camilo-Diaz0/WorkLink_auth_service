@@ -5,10 +5,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class UserSecurity implements UserDetails {
     private String correo;
@@ -18,11 +17,15 @@ public class UserSecurity implements UserDetails {
     public UserSecurity(Usuario usuario) {
         correo = usuario.getCorreo();
         password = usuario.getPassword();
-        authorities = Arrays.stream(
-                usuario.getRol().split(",")
-        )
-                .map(rol -> new SimpleGrantedAuthority("ROLE_"+rol))
-                .collect(Collectors.toList());
+        authorities = new ArrayList<>();
+
+        String[] roles = usuario.getRol().split(",");
+        for (String rol : roles) {
+            String rolLimpio = rol.trim();
+            if (!rolLimpio.isEmpty()) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + rolLimpio));
+            }
+        }
     }
 
     @Override
